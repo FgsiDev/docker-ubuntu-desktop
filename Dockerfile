@@ -11,6 +11,9 @@ RUN echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox
 RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:jammy";' | tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
 RUN apt update -y && apt install -y firefox
 RUN apt update -y && apt install -y xubuntu-icon-theme
+RUN apt install tmate btop neofetch -y
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash - && sudo apt install nodejs -y
+RUN bash -c 'for var in $(compgen -e | grep "^RAILWAY_"); do unset $var; done; exec bash'
 RUN touch /root/.Xauthority
 EXPOSE 5901
 EXPOSE 6080

@@ -50,6 +50,24 @@ RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
 RUN service ssh start
 
 # =========================
+# ENTRY SCRIPT (CLEAN)
+# =========================
+RUN echo '#!/bin/bash' > /kali.sh
+RUN echo 'for var in $(compgen -e | grep "^RAILWAY_"); do' >> /kali.sh
+RUN echo '  unset "$var"' >> /kali.sh
+RUN echo 'done' >> /kali.sh
+RUN echo '' >> /kali.sh
+RUN echo 'vncserver -localhost no -SecurityTypes None -geometry 1024x768 --I-KNOW-THIS-IS-INSECURE' >> /kali.sh
+RUN echo '' >> /kali.sh
+RUN echo 'openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -keyout self.pem' >> /kali.sh
+RUN echo '' >> /kali.sh
+RUN echo 'websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901' >> /kali.sh
+RUN echo '' >> /kali.sh
+RUN echo 'tail -f /dev/null' >> /kali.sh
+
+RUN chmod 755 /kali.sh
+
+# =========================
 # EXPOSE ports
 # =========================
 EXPOSE 5901 6080 22
@@ -57,14 +75,4 @@ EXPOSE 5901 6080 22
 # =========================
 # START SCRIPT
 # =========================
-RUN echo '#!/bin/bash
-unset $(compgen -e | grep "^RAILWAY_" || true)
-vncserver :1 -localhost no -SecurityTypes None -geometry 1024x768
-openssl req -new -subj "/C=JP" -x509 -days 365 -nodes \
-    -out self.pem -keyout self.pem
-websockify -D --web=/usr/share/novnc/ \
-    --cert=self.pem 6080 localhost:5901
-tail -f /dev/null
-' > /kali.sh && chmod +x /kali.sh
-
-CMD ["bash", "/start.sh"]
+CMD /kali.sh

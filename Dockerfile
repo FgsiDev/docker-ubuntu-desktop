@@ -1,28 +1,72 @@
-FROM kalilinux/kali-rolling 
+FROM kalilinux/kali-rolling
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update -y && apt install --no-install-recommends -y xfce4 xfce4-goodies tigervnc-standalone-server novnc websockify sudo xterm init systemd snapd vim net-tools curl wget git tzdata
-RUN apt update -y && apt install -y dbus-x11 x11-utils x11-xserver-utils x11-apps
-RUN apt install software-properties-common -y
-RUN add-apt-repository ppa:mozillateam/ppa -y
-RUN echo 'Package: *' >> /etc/apt/preferences.d/mozilla-firefox
-RUN echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox
-RUN echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox
-RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:jammy";' | tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
-RUN apt update -y && apt install -y firefox
-RUN apt update -y && apt install -y xubuntu-icon-theme
-RUN apt install tmate btop neofetch -y
+
+# =========================
+# Base tools + XFCE + VNC
+# =========================
+RUN apt update && apt upgrade -y && \
+    apt install -y --no-install-recommends \
+    xfce4 xfce4-goodies \
+    tigervnc-standalone-server novnc websockify \
+    sudo xterm dbus-x11 x11-utils x11-xserver-utils x11-apps \
+    curl wget git vim net-tools tzdata locales openssh-server \
+    software-properties-common && \
+    rm -rf /var/lib/apt/lists/*
+
+# =========================
+# Locale
+# =========================
+RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+
+# =========================
+# Firefox repo (mozillateam)
+# =========================
+RUN add-apt-repository ppa:mozillateam/ppa -y && \
+    echo 'Package: *' > /etc/apt/preferences.d/mozilla-firefox && \
+    echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox && \
+    echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox && \
+    apt update && apt install -y firefox
+
+# =========================
+# Extras tools
+# =========================
+RUN curl -fsSL https://deb.nodesource.com/setup_25.x | sudo -E bash - && sudo apt install nodejs -y
+RUN apt install -y xubuntu-icon-theme tmate btop neofetch
+
+# sshx (optional remote shell)
 RUN curl -sSf https://sshx.io/get | sh
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash - && sudo apt install nodejs -y
-RUN touch /root/.Xauthority
-EXPOSE 5901
-EXPOSE 6080
+
+# =========================
+# VNC setup
+# =========================
+RUN mkdir -p /root/.vnc && touch /root/.Xauthority
+
+# =========================
+# SSH config (optional)
+# =========================
+RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+RUN service ssh start
+
+# =========================
+# EXPOSE ports
+# =========================
+EXPOSE 5901 6080 22
+
+# =========================
+# START SCRIPT
+# =========================
 CMD bash -c '
-for var in $(compgen -e | grep "^RAILWAY_"); do
-  unset "$var"
-done
-vncserver -localhost no -SecurityTypes None -geometry 1024x768 --I-KNOW-THIS-IS-INSECURE
-openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -keyout self.pem
-websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901
+unset $(compgen -e | grep "^RAILWAY_" || true)
+
+vncserver :1 -localhost no -SecurityTypes None -geometry 1024x768
+
+openssl req -new -subj "/C=JP" -x509 -days 365 -nodes \
+    -out self.pem -keyout self.pem
+
+websockify -D --web=/usr/share/novnc/ \
+    --cert=self.pem 6080 localhost:5901
+
 tail -f /dev/null
 '

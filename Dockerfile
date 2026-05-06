@@ -57,16 +57,14 @@ EXPOSE 5901 6080 22
 # =========================
 # START SCRIPT
 # =========================
-CMD bash -c '
+RUN echo '#!/bin/bash
 unset $(compgen -e | grep "^RAILWAY_" || true)
-
 vncserver :1 -localhost no -SecurityTypes None -geometry 1024x768
-
 openssl req -new -subj "/C=JP" -x509 -days 365 -nodes \
     -out self.pem -keyout self.pem
-
 websockify -D --web=/usr/share/novnc/ \
     --cert=self.pem 6080 localhost:5901
-
 tail -f /dev/null
-'
+' > /kali.sh && chmod +x /kali.sh
+
+CMD ["bash", "/start.sh"]

@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # =========================
 # Base tools + XFCE + VNC
 # =========================
-RUN apt update && apt upgrade -y && \
+RUN apt update -y && apt upgrade -y && \
     apt install -y --no-install-recommends \
     xfce4 xfce4-goodies \
     tigervnc-standalone-server novnc websockify \
@@ -17,11 +17,12 @@ RUN apt update && apt upgrade -y && \
 # =========================
 # Firefox repo (mozillateam)
 # =========================
-RUN add-apt-repository ppa:mozillateam/ppa -y && \
-    echo 'Package: *' > /etc/apt/preferences.d/mozilla-firefox && \
-    echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox && \
-    echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox && \
-    apt update && apt install -y firefox
+RUN add-apt-repository ppa:mozillateam/ppa -y    
+RUN echo 'Package: *' >> /etc/apt/preferences.d/mozilla-firefox    
+RUN echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox    
+RUN echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox    
+RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:jammy";' | tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox    
+RUN apt update -y && apt install -y firefox
 
 # =========================
 # Extras tools

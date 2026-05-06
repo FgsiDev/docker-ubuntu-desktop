@@ -15,11 +15,6 @@ RUN apt update && apt upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
 # =========================
-# Locale
-# =========================
-RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
-
-# =========================
 # Firefox repo (mozillateam)
 # =========================
 RUN add-apt-repository ppa:mozillateam/ppa -y && \

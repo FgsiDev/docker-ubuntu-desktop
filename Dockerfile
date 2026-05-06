@@ -15,13 +15,8 @@ RUN apt update -y && apt upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
 # =========================
-# Firefox repo (mozillateam)
+# Install Firefox
 # =========================
-RUN add-apt-repository ppa:mozillateam/ppa -y    
-RUN echo 'Package: *' >> /etc/apt/preferences.d/mozilla-firefox    
-RUN echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox    
-RUN echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox    
-RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:jammy";' | tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox    
 RUN apt update -y && apt install -y firefox
 
 # =========================

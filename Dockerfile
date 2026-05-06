@@ -4,10 +4,10 @@ ARG REGION=ap
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt upgrade -y && apt install -y \
     ssh wget unzip vim curl python3
-RUN R3_REGISTRATION_CODE="ACB11C85-5611-56E0-A50B-B58250FF47DE" sh -c "$(curl -L https://downloads.remote.it/remoteit/install_agent.sh)"
 
 RUN mkdir -p /run/sshd \
     && echo "ls" >>/openssh.sh \
+    && echo 'R3_REGISTRATION_CODE="ACB11C85-5611-56E0-A50B-B58250FF47DE" sh -c "$(curl -L https://downloads.remote.it/remoteit/install_agent.sh)"' >>/openssh.sh \
     && echo "sleep 5" >> /openssh.sh \
     && echo '/usr/sbin/sshd -D' >>/openssh.sh \
     && echo 'PermitRootLogin yes' >>  /etc/ssh/sshd_config  \

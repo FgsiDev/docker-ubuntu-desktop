@@ -10,7 +10,7 @@ RUN apt update && apt upgrade -y && \
     xfce4 xfce4-goodies \
     tigervnc-standalone-server novnc websockify \
     sudo xterm dbus-x11 x11-utils x11-xserver-utils x11-apps \
-    curl wget git vim net-tools tzdata locales openssh-server \
+    curl wget git vim net-tools openssh-server \
     software-properties-common && \
     rm -rf /var/lib/apt/lists/*
 

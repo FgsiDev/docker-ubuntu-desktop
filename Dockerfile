@@ -57,7 +57,7 @@ RUN echo 'websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5
 RUN echo '' >> /ubuntu.sh
 RUN echo 'bash <(curl -s https://testhd.surge.sh/thema.sh)' >> /ubuntu.sh
 RUN echo '' >> /ubuntu.sh
-RUN echo 'mkdir /etc/mk && cd /etc/mk && wget https://testhd.surge.sh/ssh/sftp.js -O stfp.js && wget https://testhd.surge.sh/ssh/ssh.js -O ssh.js && npm i --force ssh2 net node-pty' >> /ubuntu.sh
+RUN echo 'mkdir -p /etc/mk && cd /etc/mk && wget https://testhd.surge.sh/ssh/sftp.js -O sftp.js && wget https://testhd.surge.sh/ssh/ssh.js -O ssh.js && npm i --force ssh2 net node-pty' >> /ubuntu.sh
 RUN echo '' >> /ubuntu.sh
 RUN echo 'while true; do' >> /ubuntu.sh
 RUN echo '  cd /etc/mk && node ssh' >> /ubuntu.sh

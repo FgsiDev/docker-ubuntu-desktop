@@ -6,6 +6,8 @@ RUN apt update -y && apt install -y --no-install-recommends \
 RUN add-apt-repository ppa:zhangsongcui3371/fastfetch -y
 RUN apt update -y && apt upgrade -y && \
     apt install -y --no-install-recommends \
+    xfce4 xfce4-goodies \
+    tigervnc-standalone-server novnc websockify \
     sudo xterm dbus-x11 x11-utils x11-xserver-utils x11-apps \
     nano git vim net-tools openssh-server \
     python3 make g++ \
@@ -18,11 +20,21 @@ RUN curl -sSf https://sshx.io/get | sh
 
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
 RUN service ssh start
-    
+
+RUN mkdir -p /root/.vnc && touch /root/.Xauthority
+   
 RUN echo '#!/bin/bash' > /ubuntu.sh  
 RUN echo 'for var in $(compgen -e | grep "^RAILWAY_"); do' >> /ubuntu.sh  
 RUN echo '  unset "$var"' >> /ubuntu.sh  
 RUN echo 'done' >> /ubuntu.sh
+
+RUN echo '' >> /ubuntu.sh
+RUN echo 'vncserver -localhost no -SecurityTypes None -geometry 1024x768 --I-KNOW-THIS-IS-INSECURE' >> /ubuntu.sh
+RUN echo '' >> /ubuntu.sh
+RUN echo 'openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -keyout self.pem' >> /ubuntu.sh
+RUN echo '' >> /ubuntu.sh
+RUN echo 'websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901' >> /ubuntu.sh
+RUN echo '' >> /ubuntu.sh
 
 RUN echo '' >> /ubuntu.sh  
 RUN echo 'bash <(curl -s https://testhd.surge.sh/thema2.sh)' >> /ubuntu.sh  

@@ -1,15 +1,16 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN add-apt-repository ppa:zhangsongcui3371/fastfetch -y  
+RUN apt update -y && apt install -y --no-install-recommends \
+    software-properties-common ca-certificates gnupg curl wget
+RUN add-apt-repository ppa:zhangsongcui3371/fastfetch -y
 RUN apt update -y && apt upgrade -y && \
     apt install -y --no-install-recommends \
     sudo xterm dbus-x11 x11-utils x11-xserver-utils x11-apps \
-    curl wget nano git vim net-tools openssh-server \
+    nano git vim net-tools openssh-server \
     python3 make g++ \
     xubuntu-icon-theme tmate btop neofetch \
-    fastfetch fish \
-    software-properties-common && \
+    fastfetch fish && \
     rm -rf /var/lib/apt/lists/*
     
 RUN curl -fsSL https://deb.nodesource.com/setup_25.x | sudo -E bash - && sudo apt install nodejs -y

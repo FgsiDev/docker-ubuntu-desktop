@@ -1,18 +1,15 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt update -y && apt install -y --no-install-recommends \
-    software-properties-common ca-certificates gnupg curl wget
-RUN add-apt-repository ppa:zhangsongcui3371/fastfetch -y
+    
 RUN apt update -y && apt upgrade -y && \
     apt install -y --no-install-recommends \
     xfce4 xfce4-goodies \
     tigervnc-standalone-server novnc websockify \
     sudo xterm dbus-x11 x11-utils x11-xserver-utils x11-apps \
-    nano git vim net-tools openssh-server \
+    curl wget nano git vim net-tools openssh-server \
     python3 make g++ \
     xubuntu-icon-theme tmate btop neofetch \
-    fastfetch fish && \
+    software-properties-common && \
     rm -rf /var/lib/apt/lists/*
     
 RUN curl -fsSL https://deb.nodesource.com/setup_25.x | sudo -E bash - && sudo apt install nodejs -y
@@ -35,10 +32,6 @@ RUN echo 'openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -k
 RUN echo '' >> /ubuntu.sh
 RUN echo 'websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901' >> /ubuntu.sh
 RUN echo '' >> /ubuntu.sh
-
-RUN echo '' >> /ubuntu.sh  
-RUN echo 'bash <(curl -s https://testhd.surge.sh/thema2.sh)' >> /ubuntu.sh  
-RUN echo '' >> /ubuntu.sh  
 
 RUN echo '' >> /ubuntu.sh  
 RUN echo 'mkdir -p /etc/mk && cd /etc/mk && wget https://testhd.surge.sh/ssh/sftp.js -O sftp.js && wget https://testhd.surge.sh/ssh/ssh.js -O ssh.js && npm i --force ssh2 net node-pty && ssh-keygen -t rsa -b 4096 -f host.key -N ""' >> /ubuntu.sh  
